@@ -44,7 +44,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     try {
       const product = cart.filter((prod) => prod.id === productId);
       if (product.length > 0) {
-        updateProductAmount({ productId: product[0].id, amount: product[0].amount})
+        updateProductAmount({ productId: product[0].id, amount: product[0].amount + 1})
         return;
       }
       const { data } = await api.get(`products/${productId}`)
@@ -57,7 +57,8 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const removeProduct = (productId: number) => {
     try {
-      // TODO
+      const productsToMaintain = cart.filter((prod) => prod.id !== productId)
+      setCart(productsToMaintain)
     } catch {
       // TODO
     }
@@ -68,7 +69,10 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     amount,
   }: UpdateProductAmount) => {
     try {
-      // TODO
+      const productToUpdate = cart.filter((prod) => prod.id === productId)
+      const productsToMaintain = cart.filter((prod) => prod.id !== productId)
+      productToUpdate[0].amount = amount
+      setCart([...productsToMaintain, productToUpdate[0]])
     } catch {
       // TODO
     }
