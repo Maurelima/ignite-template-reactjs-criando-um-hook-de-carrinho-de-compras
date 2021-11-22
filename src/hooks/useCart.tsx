@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '../services/api';
 import { Product, Stock } from '../types';
@@ -11,6 +11,14 @@ interface UpdateProductAmount {
   productId: number;
   amount: number;
 }
+
+// export interface Product {
+//   id: number;
+//   title: string;
+//   price: number;
+//   image: string;
+//   amount: number;
+// }
 
 interface CartContextData {
   cart: Product[];
@@ -34,7 +42,14 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const addProduct = async (productId: number) => {
     try {
-      // TODO
+      const product = cart.filter((prod) => prod.id === productId);
+      if (product.length > 0) {
+        updateProductAmount({ productId: product[0].id, amount: product[0].amount})
+        return;
+      }
+      const { data } = await api.get(`products/${productId}`)
+      data.amount = 1
+      setCart([...cart, data])
     } catch {
       // TODO
     }
